@@ -14,7 +14,7 @@ public class SystemResource {
         dao = new SystemDAO();
     }
 
-
+// GET
     @GET
     @Path("questions/{id}/options")
     @Produces(MediaType.APPLICATION_JSON)

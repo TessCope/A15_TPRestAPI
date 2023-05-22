@@ -8,7 +8,7 @@
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://mysql-tesscope.alwaysdata.net:3306/tesscope_tpquiz?useSSL=false"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://mysql-tesscope.alwaysdata.net:3306/tesscope_tpquiz?useSSL=false&amp;useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC"/>
             <property name="jakarta.persistence.jdbc.user" value="tesscope"/>
             <property name="jakarta.persistence.jdbc.password" value="mydbpass"/>
             <property name="dialect" value="org.hibernate.dialect.MySQLDialect"/>

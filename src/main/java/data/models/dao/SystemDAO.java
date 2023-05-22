@@ -77,12 +77,12 @@ public class SystemDAO implements ISystemDAO {
 
     @Override
     public List<Question> getQuestionsForQuiz(int quizId) {
-        EntityTransaction transaction = EntityManagerSingleton.getInstance().manager.getTransaction();
+        EntityTransaction transaction = manager.getTransaction();
         List<Question> questions = new ArrayList<>();
 
         try {
             transaction.begin();
-            Query query = EntityManagerSingleton.getInstance().manager.createQuery("SELECT qq.questionByQuestionId FROM QuizQuestion qq WHERE qq.quizByQuizId.quizId = :quizId");
+            Query query = manager.createQuery("SELECT qq.questionByQuestionId FROM QuizQuestion qq WHERE qq.quizByQuizId.quizId = :quizId");
             query.setParameter("quizId", quizId);
             questions = query.getResultList();
             transaction.commit();
@@ -105,19 +105,31 @@ public class SystemDAO implements ISystemDAO {
 
     @Override
     public List<Quiz> getNotUsedQuizzes() {
-        Query query = manager.createQuery("SELECT q FROM Quiz q WHERE NOT EXISTS (SELECT qq FROM QuizQuestion qq WHERE qq.quizByQuizId = q)");
-        List<Quiz> quizzes = query.getResultList();
+        EntityTransaction transaction = manager.getTransaction();
+        List<Quiz> quizzes = new ArrayList<>();
+
+        try {
+            transaction.begin();
+            Query query = manager.createQuery("SELECT q FROM Quiz q WHERE NOT EXISTS (SELECT qq FROM QuizQuestion qq WHERE qq.selectedOptionID != 0 AND qq.quizByQuizId = q)");
+            quizzes = query.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction.isActive()) {
+                transaction.rollback();
+            }
+            System.out.println(e.getMessage());
+        }
         return quizzes;
     }
 
     @Override
     public List<Quiz> getUsedQuizzes() {
-        EntityTransaction transaction = EntityManagerSingleton.getInstance().manager.getTransaction();
+        EntityTransaction transaction = manager.getTransaction();
         List<Quiz> quizzes = new ArrayList<>();
 
         try {
             transaction.begin();
-            Query query = EntityManagerSingleton.getInstance().manager.createQuery("SELECT q FROM Quiz q WHERE EXISTS (SELECT qq FROM QuizQuestion qq WHERE qq.quizByQuizId = q)");
+            Query query = manager.createQuery("SELECT qq.quizByQuizId FROM QuizQuestion qq WHERE qq.selectedOptionID != 0");
             quizzes = query.getResultList();
             transaction.commit();
         } catch (Exception e) {
@@ -151,12 +163,12 @@ public class SystemDAO implements ISystemDAO {
 
     @Override
     public Options rightOptionsForQuestion(int questionId) {
-        EntityTransaction transaction = EntityManagerSingleton.getInstance().manager.getTransaction();
+        EntityTransaction transaction = manager.getTransaction();
         Options correctOption = null;
 
         try {
             transaction.begin();
-            Query query = EntityManagerSingleton.getInstance().manager.createQuery("SELECT o FROM Options o WHERE o.questionId = :questionId AND o.estVrai = true");
+            Query query = manager.createQuery("SELECT o FROM Options o WHERE o.questionId = :questionId AND o.estVrai = true");
             query.setParameter("questionId", questionId);
             List<Options> options = query.getResultList();
             if (!options.isEmpty()) {
